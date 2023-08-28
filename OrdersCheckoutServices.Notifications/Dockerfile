@@ -1,0 +1,22 @@
+#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+WORKDIR /app
+EXPOSE 80
+
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /src
+COPY ["OrdersCheckoutServices.Notifications/OrdersCheckoutServices.Notifications.csproj", "OrdersCheckoutServices.Notifications/"]
+COPY ["OrdersCheckoutServices.Shared/OrdersCheckoutServices.Shared.csproj", "OrdersCheckoutServices.Shared/"]
+RUN dotnet restore "OrdersCheckoutServices.Notifications/OrdersCheckoutServices.Notifications.csproj"
+COPY . .
+WORKDIR "/src/OrdersCheckoutServices.Notifications"
+RUN dotnet build "OrdersCheckoutServices.Notifications.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "OrdersCheckoutServices.Notifications.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "OrdersCheckoutServices.Notifications.dll"]

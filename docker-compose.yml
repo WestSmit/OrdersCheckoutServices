@@ -1,0 +1,46 @@
+version: '3.4'
+name: orders-checkout-services
+
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.12-management
+    hostname: rabbitmq
+    environment:
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672
+ 
+  mongodb:
+    image: mongo:6-jammy
+    hostname: mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - dbdata6:/data/db
+ 
+  orderscheckoutservices.api.orders:
+    container_name: orderscheckoutservices.api.orders
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    build:      
+      context: .
+      dockerfile: OrdersCheckoutServices.Api.Orders/Dockerfile  
+    ports:
+      - 8080:80
+
+  orderscheckoutservices.notifications:
+    container_name: orderscheckoutservices.notifications
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    build:      
+      context: .
+      dockerfile: OrdersCheckoutServices.Notifications/Dockerfile
+    depends_on:
+      - mongodb
+
+volumes:
+  dbdata6:
