@@ -2,8 +2,8 @@
 
 To run the project make sure you have installed docker and docker-compose.
 
-1. Execute ```docker-compose up``` at the root folder.
-2. Use Swagger to send API request.
+1. Execute ```docker-compose -f 'docker-compose.yml' -f 'docker-compose.override.yml' up``` at the root folder.
+2. Use Swagger ```http://localhost:8080/swagger/index.html``` to send API requests.
 
 Request body example for swagger:
 ```
@@ -17,3 +17,7 @@ Request body example for swagger:
   ]
 }
 ```
+RabbitMq
+http://localhost:15672/#/,
+username: `rmuser`
+password: `rmpassword`
